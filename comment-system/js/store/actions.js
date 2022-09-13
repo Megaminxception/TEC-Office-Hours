@@ -7,5 +7,8 @@ export default {
   },
   editNote(context, payload) {
     context.commit('editNote', payload);
-  }
+  },
+  favoriteComment(context, payload) {
+    context.commit('favoriteComment', payload);
+  },
 };

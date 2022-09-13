@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     upgrade(db) {
       // Creates 'comments' Object Store if it doesn't already exist.
       db.createObjectStore('comments', { autoIncrement: true });
+      db.createObjectStore('note', {autoIncrement: true});
       console.log('hi');
     },
   });
@@ -23,6 +24,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   for (let i = 0; i < comments.length; i++) {
     store.dispatch('addComment', comments[i]);
   }
+  // Add note
+  const noteValue = document.querySelector('#note');
+  let note = await(db.getAll('note'));
+  if (note.length != 0) {
+    noteValue.value = note[note.length-1];
+  }
+
   db.close();
 });
 
@@ -61,5 +69,37 @@ const noteValue = document.querySelector('#note');
 noteElement.addEventListener('submit', async (evt) => {
   evt.preventDefault();
   let note = noteValue.value.trim();
+
+  const db = await openDB('comment-store', 1);
+  await db.put('note', note);
+  db.close();
   store.dispatch('editNote', note);
+});
+
+const showFavorites = document.querySelector('#show-favorites');
+showFavorites.addEventListener('click', async() => {
+  // console.log('button pressed');
+  // let x = i++; != let x = i + 1;
+  // let y = ++i; == let y = i + 1;
+
+  // clear old comments
+  const commentLength = store.state.comments.length;
+  /**
+   * comments = []
+   * length = comments.length; == 3
+   * while i < length: i = 3
+   *  deleteComment(comments[0]);
+   *  i++
+   */
+  for (let i = 0; i < commentLength; i++) {
+    store.dispatch('clearComment', { index: 0 });
+  }
+
+  const db = await openDB('comment-store', 1);
+  const comments = ((await db.getAll('comments')) || {});
+  for (let i = 0; i < comments.length; ++i) {
+    if (store.state.favorites.includes(i)) {
+      store.dispatch('addComment', comments[i]);
+    }
+  }
 });

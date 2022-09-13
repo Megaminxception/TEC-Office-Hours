@@ -20,13 +20,19 @@ export default class Comment extends Component {
       ${store.state.comments.map(comment => {
         return `
         <comment- name='${comment.name}' email='${comment.email}' contents='${comment.contents}'></comment->
-        <button>Delete Comment</button>
+        <button class='delete'>Delete Comment</button>
+        <button class='favorite'>Favorite</button>
         `;
       }).join('')}
     </div>`;
-    this.element.querySelectorAll('button').forEach((button, index) => {
+    this.element.querySelectorAll('.delete').forEach((button, index) => {
       button.addEventListener('click', () => {
         store.dispatch('clearComment', { index });
+      });
+    });
+    this.element.querySelectorAll('.favorite').forEach((button, index) => {
+      button.addEventListener('click', () => {
+        store.dispatch('favoriteComment', { index });
       });
     });
   }
